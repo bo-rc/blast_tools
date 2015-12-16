@@ -81,14 +81,14 @@ OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-MaxHits_$NUM_REPORT_HITS-input_${INPU
 ############################################
 # generage database if they do not exist
 
-[ ! -e "./Ecoli.psq" ] && \
-[ ! -e "./Ecoli.psi" ] && \
-[ ! -e "./Ecoli.psd" ] && \
-[ ! -e "./Ecoli.pog" ] && \
-[ ! -e "./Ecoli.pni" ] && \
-[ ! -e "./Ecoli.pnd" ] && \
-[ ! -e "./Ecoli.pin" ] && \
-[ ! -e "./Ecoli.phr" ] && \
+[ ! -e "./$DATABASE_NAME.psq" ] && \
+[ ! -e "./$DATABASE_NAME.psi" ] && \
+[ ! -e "./$DATABASE_NAME.psd" ] && \
+[ ! -e "./$DATABASE_NAME.pog" ] && \
+[ ! -e "./$DATABASE_NAME.pni" ] && \
+[ ! -e "./$DATABASE_NAME.pnd" ] && \
+[ ! -e "./$DATABASE_NAME.pin" ] && \
+[ ! -e "./$DATABASE_NAME.phr" ] && \
 makeblastdb -in $DATABASE -out $DATABASE_NAME -dbtype prot -parse_seqids
 
 # final report
