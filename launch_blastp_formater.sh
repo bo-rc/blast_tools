@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for e in 0.01
+for e in 0.01 0.005 0.001
 do
 ./blastp_formater.sh \
     --input-fasta M_myc_aaRS.txt \
