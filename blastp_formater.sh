@@ -4,6 +4,7 @@ then
     echo "Usage:"
     echo "$0 [-h,-help] [-i,--input-fasta] [-d,--database] <-e,--evalue>
     <-nd,--num_descriptions> <-na,--num_alignments> <-o --output-filename>
+    <-cl,--clean> <-nrh,--num-report-hits>
 
     where:
         -h, --help  show this help text
@@ -12,7 +13,9 @@ then
 	-e, --evalue the E value
 	-nd, --num_descriptions 
 	-na, --num_alignments
-	-o, --output-filename "
+	-o, --output-filename 
+	-cl, --clean 
+	-nrh, --num-report-hits "
     exit 0
 fi
     
@@ -46,10 +49,21 @@ do
 	    NUM_ALIGNMENTS_SET="$2"
 	    shift
 	    ;;
+
 	-o|--output-filename)
 	    OUTPUTREPORT="$2"
 	    shift
 	    ;;
+
+	-cl|--clean)
+	    DEBUG_CLEAN=1
+	    ;;
+
+	-nrh|--num-report-hits)
+	    NUM_REPORT_HITS=2
+	    shift
+	    ;;
+
 		    *) # unknown option
 	    ;;
     esac
@@ -64,8 +78,16 @@ NUM_ALIGNMENTS=${NUM_ALIGNMENTS_SET:-9}
 OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-input_${INPUT_FASTA%.*}-db_$DATABASE_NAME-evalue_$EVALUE.txt"
 
 ############################################
-# do the work
+# generage database if they do not exist
 
+[ ! -e "./Ecoli.psq" ] && \
+[ ! -e "./Ecoli.psi" ] && \
+[ ! -e "./Ecoli.psd" ] && \
+[ ! -e "./Ecoli.pog" ] && \
+[ ! -e "./Ecoli.pni" ] && \
+[ ! -e "./Ecoli.pnd" ] && \
+[ ! -e "./Ecoli.pin" ] && \
+[ ! -e "./Ecoli.phr" ] && \
 makeblastdb -in $DATABASE -out $DATABASE_NAME -dbtype prot -parse_seqids
 
 # final report
@@ -92,7 +114,7 @@ do
     echo $line >> query.$ENTRY.fasta
     # Blast outputs archive
     blastp -outfmt \
-	"6 sseqid slen length evalue bitscore pident" \
+	"7 sseqid slen length evalue bitscore pident" \
 	-query query.$ENTRY.fasta -out blastp.$ENTRY.report \
 	-db $DATABASE_NAME -evalue $EVALUE \
 	#-num_descriptions $NUM_DESCRIPTIONS -num_alignments $NUM_ALIGNMENTS
@@ -117,15 +139,16 @@ do
     LINE_NUM=2
     while read line
     do
-	if [[ $line == *"Fields"* ]] # Append to Fields description with "% percid" 
+	if [[ $line == *"0 hits found"* ]] # Append to Fields description with "% percid" 
 	then
 
-	    echo "$line , % percid, annotation" >> $OUTPUTREPORT
+	    echo "0 hits found" >> $OUTPUTREPORT
 
 	elif [[ $line == \#* ]] # other comment line
 	then
 
-	    echo $line >> $OUTPUTREPORT
+	    # not include comments
+	    echo 
 
 	else # entries that need to be processed
 	    PERCENT=$(cat percid.$ENTRY.percid_matrix | head -n$LINE_NUM | tail -n1 | awk '{print $1}')
@@ -140,15 +163,23 @@ do
 	    IFS="	"
 	    printf "%30s %10s %10s %10s %8s %10s %10s %s\n" ${line[0]} ${line[1]} ${line[2]} ${line[3]} ${line[4]} ${line[5]} $PERCENT $SCINAME >> $OUTPUTREPORT
 
+	    if [[ $LINE_NUM -gt $NUM_REPORT_HITS ]]
+	    then 
+		break
+	    fi
+
 	    LINE_NUM=$((LINE_NUM+1))
 
 	fi
     done <blastp.$ENTRY.report
     echo  >> $OUTPUTREPORT
 
-    rm Match.$ENTRY.fasta Match.$ENTRY.fasta.aligned \
+    if [[ $DEBUG_CLEAN ]]
+    then
+    	rm Match.$ENTRY.fasta Match.$ENTRY.fasta.aligned \
 	    percid.$ENTRY.percid_matrix query.$ENTRY.fasta REF.$ENTRY.fasta \
-	        blastp.$ENTRY.report blastdbcmd.$ENTRY.fasta
+	        blastp.$ENTRY.report blastdbcmd.$ENTRY.fasta 
+    fi
 
     ENTRY=$((ENTRY+1))
 done <$INPUT_FASTA
