@@ -61,7 +61,7 @@ DATABASE_NAME=${DATABASE%.*}
 EVALUE=${EVALUE_SET:-0.001}
 NUM_DESCRIPTIONS=${NUM_DESCRIPTIONS_SET:-9}
 NUM_ALIGNMENTS=${NUM_ALIGNMENTS_SET:-9}
-OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-input_${INPUT_FAST%.*}-db_$DATABASE_NAME-evalue_$EVALUE.txt"
+OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-input_${INPUT_FASTA%.*}-db_$DATABASE_NAME-evalue_$EVALUE.txt"
 
 ############################################
 # do the work
