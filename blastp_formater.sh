@@ -60,7 +60,7 @@ do
 	    ;;
 
 	-nrh|--num-report-hits)
-	    NUM_REPORT_HITS=2
+	    NUM_REPORT_HITS_SET="$2"
 	    shift
 	    ;;
 
@@ -73,9 +73,10 @@ done
 # processing input arguments 
 DATABASE_NAME=${DATABASE%.*}
 EVALUE=${EVALUE_SET:-0.001}
+NUM_REPORT_HITS=${NUM_REPORT_HITS_SET:-2}
 NUM_DESCRIPTIONS=${NUM_DESCRIPTIONS_SET:-9}
 NUM_ALIGNMENTS=${NUM_ALIGNMENTS_SET:-9}
-OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-input_${INPUT_FASTA%.*}-db_$DATABASE_NAME-evalue_$EVALUE.txt"
+OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-MaxHits_$NUM_REPORT_HITS-input_${INPUT_FASTA%.*}-db_$DATABASE_NAME-evalue_$EVALUE.txt"
 
 ############################################
 # generage database if they do not exist
@@ -172,6 +173,7 @@ do
 
 	fi
     done <blastp.$ENTRY.report
+
     echo  >> $OUTPUTREPORT
 
     if [[ $DEBUG_CLEAN ]]

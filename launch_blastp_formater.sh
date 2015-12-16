@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# try all the evalues in the following list
 for e in 0.01
 do
 ./blastp_formater.sh \
@@ -7,6 +8,6 @@ do
     --output-filename report \
     --database Ecoli.fasta \
     --clean \
-    --num-report-hits 2 \
+    --num-report-hits 1 \
     --evalue $e
 done
