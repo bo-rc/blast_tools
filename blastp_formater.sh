@@ -2,26 +2,27 @@
 if [[ ($1 == "-h") || ($1 == "--help") ]]
 then
     echo "Usage:"
-    echo "$0 [-h,-help] [-i,-input] [-d,-database] <-e,--evalue>
-    <-nd,--num_descriptions> <-na,--num_alignments> <-o --output_report>
+    echo "$0 [-h,-help] [-i,--input-fasta] [-d,--database] <-e,--evalue>
+    <-nd,--num_descriptions> <-na,--num_alignments> <-o --output-filename>
 
     where:
         -h, --help  show this help text
-	-i, --input the input FASTA file
+	-i, --input-fasta the input FASTA file
 	-d, --database database FASTA file
 	-e, --evalue the E value
 	-nd, --num_descriptions 
 	-na, --num_alignments
-	-o, --output_report "
+	-o, --output-filename "
     exit 0
 fi
     
+# parsing input arguments
 while [[ $# > 1 ]]
 do
     key="$1"
 
     case $key in
-	-i|--input)
+	-i|--input-fasta)
 	    INPUT_FASTA="$2"
 	    shift
 	    ;;
@@ -45,7 +46,7 @@ do
 	    NUM_ALIGNMENTS_SET="$2"
 	    shift
 	    ;;
-	-o|--output_report)
+	-o|--output-filename)
 	    OUTPUTREPORT="$2"
 	    shift
 	    ;;
@@ -55,10 +56,12 @@ do
     shift
 done
 
+# processing input arguments 
 DATABASE_NAME=${DATABASE%.*}
 EVALUE=${EVALUE_SET:-0.001}
 NUM_DESCRIPTIONS=${NUM_DESCRIPTIONS_SET:-9}
 NUM_ALIGNMENTS=${NUM_ALIGNMENTS_SET:-9}
+OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-input_${INPUT_FASTA%.*}-db_$DATABASE_NAME-evalue_$EVALUE.txt"
 
 ############################################
 # do the work
@@ -66,7 +69,21 @@ NUM_ALIGNMENTS=${NUM_ALIGNMENTS_SET:-9}
 makeblastdb -in $DATABASE -out $DATABASE_NAME -dbtype prot -parse_seqids
 
 # final report
-echo "# blastp table task final report" > $OUTPUTREPORT
+echo "\
+# blastp report:  
+#    Input: $INPUT_FASTA
+#    Database: $DATABASE_NAME
+#    Evalue: $EVALUE
+# Fields: subject id, subject length, alignment length, evalue, bit score, % identity, % percid, annotation
+" > $OUTPUTREPORT
+
+printf "%30s %10s %10s %10s %8s %10s %10s     %s\n" \
+	"HitID" "Length" "Alignment" "Evalue" "BitScore" "%id" \
+	"%percid" "Annotation" >> $OUTPUTREPORT
+echo \
+---------------------------------------------------------------------------------------------------------------------------------------------------------- \
+>> $OUTPUTREPORT
+
 
 ENTRY=0
 while read line
@@ -75,7 +92,7 @@ do
     echo $line >> query.$ENTRY.fasta
     # Blast outputs archive
     blastp -outfmt \
-	"7 sseqid scinames len slen length evalue bitscore pident" \
+	"6 sseqid slen length evalue bitscore pident" \
 	-query query.$ENTRY.fasta -out blastp.$ENTRY.report \
 	-db $DATABASE_NAME -evalue $EVALUE \
 	#-num_descriptions $NUM_DESCRIPTIONS -num_alignments $NUM_ALIGNMENTS
@@ -86,13 +103,17 @@ do
 
     # align query sequence with all hits
     cat query.$ENTRY.fasta blastdbcmd.$ENTRY.fasta > Match.$ENTRY.fasta
-    mafft --auto Match.$ENTRY.fasta > Match.$ENTRY.fasta.aligned
+    mafft Match.$ENTRY.fasta > Match.$ENTRY.fasta.aligned
 
     # calculate PID using percid
     percid Match.$ENTRY.fasta.aligned percid.$ENTRY.percid_matrix
 
-    # appending percid to report
-    echo "##########  Query entry: $ENTRY ##########" >> $OUTPUTREPORT
+    # output report
+    ## header for every entry
+    echo "Query $ENTRY:" >> $OUTPUTREPORT
+    echo  >> $OUTPUTREPORT
+
+    ## append percid to report
     LINE_NUM=2
     while read line
     do
@@ -107,23 +128,27 @@ do
 	    echo $line >> $OUTPUTREPORT
 
 	else # entries that need to be processed
-	    PERCENT=`cat percid.$ENTRY.percid_matrix | head -n$LINE_NUM | tail -n1 | awk '{print $1}'`
-	    PERCENT=`echo "scale = 2; $PERCENT* 100" | bc`
+	    PERCENT=$(cat percid.$ENTRY.percid_matrix | head -n$LINE_NUM | tail -n1 | awk '{print $1}')
+	    PERCENT=$(echo "scale=2; $PERCENT*100" | bc)
+	    PERCENT=$(printf '%*.*f' 0 2 "$PERCENT")
 
 	    # extract annotation
-	    ID=`echo $line | awk 'BEGIN { FS="|" } { print $2 }'`
-	    ID_header=`grep $ID $DATABASE`
-	    SCINAME=`echo $ID_header | awk 'BEGIN { FS="|" } { print $5 }'`
+	    ID=$(echo $line | awk 'BEGIN { FS="|" } { print $2 }')
+	    ID_header=$(grep $ID $DATABASE)
+	    SCINAME=$(echo $ID_header | awk 'BEGIN { FS="|" } { print $5 }')
 
-	    echo $line $PERCENT $SCINAME >> $OUTPUTREPORT
+	    IFS="	"
+	    printf "%30s %10s %10s %10s %8s %10s %10s %s\n" ${line[0]} ${line[1]} ${line[2]} ${line[3]} ${line[4]} ${line[5]} $PERCENT $SCINAME >> $OUTPUTREPORT
 
 	    LINE_NUM=$((LINE_NUM+1))
 
 	fi
     done <blastp.$ENTRY.report
+    echo  >> $OUTPUTREPORT
 
-
-    #rm query.$ENTRY.fasta REF.$ENTRY.fasta
+    rm Match.$ENTRY.fasta Match.$ENTRY.fasta.aligned \
+	    percid.$ENTRY.percid_matrix query.$ENTRY.fasta REF.$ENTRY.fasta \
+	        blastp.$ENTRY.report blastdbcmd.$ENTRY.fasta
 
     ENTRY=$((ENTRY+1))
 done <$INPUT_FASTA
