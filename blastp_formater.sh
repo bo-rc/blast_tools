@@ -99,7 +99,7 @@ do
 	if [[ $line == *"Fields"* ]] # Append to Fields description with "% percid" 
 	then
 
-	    echo "$line % percid" >> $OUTPUTREPORT
+	    echo "$line , % percid, annotation" >> $OUTPUTREPORT
 
 	elif [[ $line == \#* ]] # other comment line
 	then
