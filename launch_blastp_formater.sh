@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# try all the evalues in the following list
 for e in 0.01 0.005 0.001
 do
 ./blastp_formater.sh \
