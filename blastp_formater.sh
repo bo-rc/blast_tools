@@ -81,14 +81,14 @@ OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-MaxHits_$NUM_REPORT_HITS-input_${INPU
 ############################################
 # generage database if they do not exist
 
-[ ! -e "./Ecoli.psq" ] && \
-[ ! -e "./Ecoli.psi" ] && \
-[ ! -e "./Ecoli.psd" ] && \
-[ ! -e "./Ecoli.pog" ] && \
-[ ! -e "./Ecoli.pni" ] && \
-[ ! -e "./Ecoli.pnd" ] && \
-[ ! -e "./Ecoli.pin" ] && \
-[ ! -e "./Ecoli.phr" ] && \
+[ ! -e "$DATABASE_NAME.psq" ] && \
+[ ! -e "$DATABASE_NAME.psi" ] && \
+[ ! -e "$DATABASE_NAME.psd" ] && \
+[ ! -e "$DATABASE_NAME.pog" ] && \
+[ ! -e "$DATABASE_NAME.pni" ] && \
+[ ! -e "$DATABASE_NAME.pnd" ] && \
+[ ! -e "$DATABASE_NAME.pin" ] && \
+[ ! -e "$DATABASE_NAME.phr" ] && \
 makeblastdb -in $DATABASE -out $DATABASE_NAME -dbtype prot -parse_seqids
 
 # final report
@@ -107,12 +107,37 @@ echo \
 ---------------------------------------------------------------------------------------------------------------------------------------------------------- \
 >> $OUTPUTREPORT
 
+NUM_LINES=$(wc -l < $INPUT_FASTA)
 
 ENTRY=0
-while read line
+COUNT=1
+NEW_ENTRY=1
+while [[ $COUNT -le $NUM_LINES ]]
 do
-    echo ">MMSYN seq. $ENTRY" > query.$ENTRY.fasta
-    echo $line >> query.$ENTRY.fasta
+    THIS_LINE=$(sed "${COUNT}q;d" $INPUT_FASTA)
+    
+    if [[ $NEW_ENTRY == 1 ]] # '>' line of a new entry
+    then
+	echo $THIS_LINE > query.$ENTRY.fasta
+	COUNT=$((COUNT+1))
+	NEW_ENTRY=0
+	continue
+    else
+	if [[ $THIS_LINE =~ ^\> ]] # '>' line of the next new entry
+	then
+	    NEW_ENTRY=1
+	else                       # sequence lines
+	    echo $THIS_LINE >> query.$ENTRY.fasta
+	    COUNT=$((COUNT+1))
+	    if [[ $COUNT -gt $NUM_LINES ]] # the last line
+	    then
+		echo 
+	    else                          # not the last line
+	        continue
+	    fi
+	fi
+    fi
+
     # Blast outputs archive
     blastp -outfmt \
 	"7 sseqid slen length evalue bitscore pident" \
@@ -176,17 +201,15 @@ do
 
     echo  >> $OUTPUTREPORT
 
-    if [[ $DEBUG_CLEAN ]]
-    then
-    	rm Match.$ENTRY.fasta Match.$ENTRY.fasta.aligned \
-	    percid.$ENTRY.percid_matrix query.$ENTRY.fasta REF.$ENTRY.fasta \
-	        blastp.$ENTRY.report blastdbcmd.$ENTRY.fasta 
-    fi
 
     ENTRY=$((ENTRY+1))
-done <$INPUT_FASTA
+done
 
 
 # cleanup
-unset INPUT_FASTA DATABASE DATABASE_NAME COUNT EVALUE_SET EVALUE NUM_DESCRIPTIONS_SET NUM_DESCRIPTIONS NUM_ALIGNMENTS_SET NUM_ALIGNMENTS LINE_NUM PERCENT
-  
+if [[ $DEBUG_CLEAN ]]
+then
+    rm Match.*.fasta Match.*.fasta.aligned \
+    percid.*.percid_matrix query.*.fasta REF.*.fasta \
+    blastp.*.report blastdbcmd.*.fasta 
+fi
