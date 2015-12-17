@@ -4,7 +4,7 @@ then
     echo "Usage:"
     echo "$0 [-h,-help] [-i,--input-fasta] [-d,--database] <-e,--evalue>
     <-nd,--num_descriptions> <-na,--num_alignments> <-o --output-filename>
-    <-cl,--clean> <-nrh,--num-report-hits>
+    <-cl,--clean> <-nrh,--num-report-hits> <-nthr, --num-threads>
 
     where:
         -h, --help  show this help text
@@ -15,7 +15,8 @@ then
 	-na, --num_alignments
 	-o, --output-filename 
 	-cl, --clean 
-	-nrh, --num-report-hits "
+	-nrh, --num-report-hits 
+	-nthr, --num-threads "
     exit 0
 fi
     
@@ -63,6 +64,10 @@ do
 	    NUM_REPORT_HITS_SET="$2"
 	    shift
 	    ;;
+	-nthr|--num-threads)
+	    NUM_THREDS_SET="$2"
+	    shift
+	    ;;
 
 		    *) # unknown option
 	    ;;
@@ -73,6 +78,7 @@ done
 # processing input arguments 
 DATABASE_NAME=${DATABASE%.*}
 EVALUE=${EVALUE_SET:-0.001}
+NUM_THREDS=${NUM_THREDS_SET:-4}
 NUM_REPORT_HITS=${NUM_REPORT_HITS_SET:-2}
 NUM_DESCRIPTIONS=${NUM_DESCRIPTIONS_SET:-9}
 NUM_ALIGNMENTS=${NUM_ALIGNMENTS_SET:-9}
@@ -141,7 +147,7 @@ do
     blastp -outfmt \
 	"7 sseqid slen length evalue bitscore pident" \
 	-query query.$ENTRY.fasta -out blastp.$ENTRY.report \
-	-db $DATABASE_NAME -evalue $EVALUE \
+	-db $DATABASE_NAME -evalue $EVALUE -num_threads	$NUM_THREDS\
 	#-num_descriptions $NUM_DESCRIPTIONS -num_alignments $NUM_ALIGNMENTS
 
     # build a fasta file for all hits
