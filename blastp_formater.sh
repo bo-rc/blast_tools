@@ -80,7 +80,6 @@ OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-MaxHits_$NUM_REPORT_HITS-input_${INPU
 
 ############################################
 # generage database if they do not exist
-
 [ ! -e "$DATABASE_NAME.psq" ] && \
 [ ! -e "$DATABASE_NAME.psi" ] && \
 [ ! -e "$DATABASE_NAME.psd" ] && \
