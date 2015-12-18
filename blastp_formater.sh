@@ -214,7 +214,7 @@ do
 
     echo  >> $OUTPUTREPORT
 
-    if [[ $BACK ]]
+    if [[ $BACK == 1 ]]
     then
 	if [[ ! -e "input_as_db.phr" ]]
 	then
@@ -256,7 +256,7 @@ done
 
 
 # cleanup
-if [[ $DEBUG_CLEAN ]]
+if [[ $DEBUG_CLEAN == 1 ]]
 then
     rm Match.*.fasta Match.*.fasta.aligned \
     percid.*.percid_matrix query.*.fasta REF.*.fasta \
