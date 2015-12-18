@@ -59,22 +59,26 @@ do
 	    ;;
 
 	-cl|--clean)
-	    DEBUG_CLEAN=1
+	    DEBUG_CLEAN="$2"
+	    shift
+	    ;;
+
+	-bks|--backward-search)
+	    BACK="$2"
+	    shift
 	    ;;
 
 	-nrh|--num-report-hits)
 	    NUM_REPORT_HITS_SET="$2"
 	    shift
 	    ;;
+
 	-nthr|--num-threads)
 	    NUM_THREDS_SET="$2"
 	    shift
 	    ;;
-	-bks|--backward-search)
-	    BACKWARD_SEARCH=1
-	    ;;
-		    *) # unknown option
-	    ;;
+
+
     esac
     shift
 done
@@ -210,7 +214,7 @@ do
 
     echo  >> $OUTPUTREPORT
 
-    if [[ 1 ]]
+    if [[ $BACK ]]
     then
 	if [[ ! -e "input_as_db.phr" ]]
 	then
@@ -225,8 +229,24 @@ do
 	    -query backward_search.$ENTRY.fasta -out backward_search.$ENTRY.report \
 	    -db input_as_db -evalue $EVALUE -num_threads $NUM_THREDS
 
-	echo "Backward Search hits:" >> $OUTPUTREPORT
-	grep "ref|\|gi|" backward_search.$ENTRY.report | head -n1 | awk 'BEGIN { FS="|" } { print $2 }' >> $OUTPUTREPORT
+	echo "  Backward Search hits:" >> $OUTPUTREPORT
+	#grep "ref|\|gi|" backward_search.$ENTRY.report | head -n1 | awk 'BEGIN { FS="|" } { print $2 }' >> $OUTPUTREPORT
+	REPORT_STRING=$(grep "^gi|" backward_search.$ENTRY.report | head -n1)
+
+        # align query sequence with all hits
+        cat backward_search.$ENTRY.fasta query.$ENTRY.fasta > backward_search.Match.$ENTRY.fasta
+        mafft backward_search.Match.$ENTRY.fasta > backward_search.Match.$ENTRY.fasta.aligned
+
+        # calculate PID using percid
+        percid backward_search.Match.$ENTRY.fasta.aligned backward_search.percid.$ENTRY.percid_matrix
+	PERCENT=$(cat backward_search.percid.$ENTRY.percid_matrix | tail -n1 | awk '{print $1}')
+	PERCENT=$(echo "scale=2; $PERCENT*100" | bc)
+	PERCENT=$(printf '%*.*f' 0 2 "$PERCENT")
+
+	arr=($REPORT_STRING)
+	printf "%30s %10s %10s %10s %8s %10s %10s\n" ${arr[1]} \
+	${arr[2]} ${arr[3]} ${arr[4]} \
+	${arr[5]} ${arr[6]} $PERCENT >> $OUTPUTREPORT
 
 	echo  >> $OUTPUTREPORT
     fi
