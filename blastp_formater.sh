@@ -5,6 +5,7 @@ then
     echo "$0 [-h,-help] [-i,--input-fasta] [-d,--database] <-e,--evalue>
     <-nd,--num_descriptions> <-na,--num_alignments> <-o --output-filename>
     <-cl,--clean> <-nrh,--num-report-hits> <-nthr, --num-threads>
+    <-bks, --backward-search>
 
     where:
         -h, --help  show this help text
@@ -16,7 +17,8 @@ then
 	-o, --output-filename 
 	-cl, --clean 
 	-nrh, --num-report-hits 
-	-nthr, --num-threads "
+	-nthr, --num-threads 
+	-bks, --backward-search "
     exit 0
 fi
     
@@ -68,7 +70,9 @@ do
 	    NUM_THREDS_SET="$2"
 	    shift
 	    ;;
-
+	-bks|--backward-search)
+	    BACKWARD_SEARCH=1
+	    ;;
 		    *) # unknown option
 	    ;;
     esac
@@ -147,7 +151,7 @@ do
     blastp -outfmt \
 	"7 sseqid slen length evalue bitscore pident" \
 	-query query.$ENTRY.fasta -out blastp.$ENTRY.report \
-	-db $DATABASE_NAME -evalue $EVALUE -num_threads	$NUM_THREDS\
+	-db $DATABASE_NAME -evalue $EVALUE -num_threads	$NUM_THREDS
 	#-num_descriptions $NUM_DESCRIPTIONS -num_alignments $NUM_ALIGNMENTS
 
     # build a fasta file for all hits
@@ -163,7 +167,7 @@ do
 
     # output report
     ## header for every entry
-    echo "Query $ENTRY:" >> $OUTPUTREPORT
+    echo "Query $(sed "1q;d" query.$ENTRY.fasta):" >> $OUTPUTREPORT
     echo  >> $OUTPUTREPORT
 
     ## append percid to report
@@ -206,6 +210,26 @@ do
 
     echo  >> $OUTPUTREPORT
 
+    if [[ 1 ]]
+    then
+	if [[ ! -e "input_as_db.phr" ]]
+	then
+	    makeblastdb -in $INPUT_FASTA -out input_as_db -dbtype prot -parse_seqids
+	fi
+	BACKWARD_SEARCH_ENTRY_ID=$(grep "ref|\|gi|" blastp.$ENTRY.report | head -n1 | awk 'BEGIN { FS="|" } { print $2 }')
+	ENTRY_STRING="'$BACKWARD_SEARCH_ENTRY_ID'"
+	eval "blastdbcmd -db $DATABASE_NAME -dbtype prot -entry $ENTRY_STRING > backward_search.$ENTRY.fasta"
+
+	blastp -outfmt \
+	    "7 qseqid sseqid slen length evalue bitscore pident" \
+	    -query backward_search.$ENTRY.fasta -out backward_search.$ENTRY.report \
+	    -db input_as_db -evalue $EVALUE -num_threads $NUM_THREDS
+
+	echo "Backward Search hits:" >> $OUTPUTREPORT
+	grep "ref|\|gi|" backward_search.$ENTRY.report | head -n1 | awk 'BEGIN { FS="|" } { print $2 }' >> $OUTPUTREPORT
+
+	echo  >> $OUTPUTREPORT
+    fi
 
     ENTRY=$((ENTRY+1))
 done
@@ -216,5 +240,5 @@ if [[ $DEBUG_CLEAN ]]
 then
     rm Match.*.fasta Match.*.fasta.aligned \
     percid.*.percid_matrix query.*.fasta REF.*.fasta \
-    blastp.*.report blastdbcmd.*.fasta 
+    blastp.*.report blastdbcmd.*.fasta backward_search.*
 fi
