@@ -102,6 +102,7 @@ OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-MaxHits_$NUM_REPORT_HITS-input_${INPU
 [ ! -e "$DATABASE_NAME.pnd" ] && \
 [ ! -e "$DATABASE_NAME.pin" ] && \
 [ ! -e "$DATABASE_NAME.phr" ] && \
+
 makeblastdb -in $DATABASE -out $DATABASE_NAME -dbtype prot -parse_seqids
 
 # final report
@@ -120,37 +121,12 @@ echo \
 ---------------------------------------------------------------------------------------------------------------------------------------------------------- \
 >> $OUTPUTREPORT
 
-NUM_LINES=$(wc -l < $INPUT_FASTA)
 
 ENTRY=0
-COUNT=1
-NEW_ENTRY=1
-while [[ $COUNT -le $NUM_LINES ]]
+while read line
 do
-    THIS_LINE=$(sed "${COUNT}q;d" $INPUT_FASTA)
-    
-    if [[ $NEW_ENTRY == 1 ]] # '>' line of a new entry
-    then
-	echo $THIS_LINE > query.$ENTRY.fasta
-	COUNT=$((COUNT+1))
-	NEW_ENTRY=0
-	continue
-    else
-	if [[ $THIS_LINE =~ ^\> ]] # '>' line of the next new entry
-	then
-	    NEW_ENTRY=1
-	else                       # sequence lines
-	    echo $THIS_LINE >> query.$ENTRY.fasta
-	    COUNT=$((COUNT+1))
-	    if [[ $COUNT -gt $NUM_LINES ]] # the last line
-	    then
-		echo 
-	    else                          # not the last line
-	        continue
-	    fi
-	fi
-    fi
-
+    echo ">MMSYN seq. $ENTRY" > query.$ENTRY.fasta
+    echo $line >> query.$ENTRY.fasta
     # Blast outputs archive
     blastp -outfmt \
 	"7 sseqid slen length evalue bitscore pident" \
@@ -252,7 +228,7 @@ do
     fi
 
     ENTRY=$((ENTRY+1))
-done
+done <$INPUT_FASTA
 
 
 # cleanup
@@ -260,5 +236,8 @@ if [[ $DEBUG_CLEAN == 1 ]]
 then
     rm Match.*.fasta Match.*.fasta.aligned \
     percid.*.percid_matrix query.*.fasta REF.*.fasta \
-    blastp.*.report blastdbcmd.*.fasta backward_search.*
+    blastp.*.report blastdbcmd.*.fasta backward_search.* \
+    input_as_db.phr
 fi
+
+unset INPUT_FASTA DATABASE DATABASE_NAME COUNT EVALUE_SET EVALUE NUM_DESCRIPTIONS_SET NUM_DESCRIPTIONS NUM_ALIGNMENTS_SET NUM_ALIGNMENTS LINE_NUM PERCENT
