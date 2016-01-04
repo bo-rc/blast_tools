@@ -131,7 +131,7 @@ do
     blastp -outfmt \
 	"7 sseqid slen length evalue bitscore pident" \
 	-query query.$ENTRY.fasta -out blastp.$ENTRY.report \
-	-db $DATABASE_NAME -evalue $EVALUE -num_threads	$NUM_THREDS
+	-db $DATABASE_NAME -evalue $EVALUE -num_threads	$NUM_THREDS -lcase_masking
 	#-num_descriptions $NUM_DESCRIPTIONS -num_alignments $NUM_ALIGNMENTS
 
     # build a fasta file for all hits
@@ -203,7 +203,7 @@ do
 	blastp -outfmt \
 	    "7 qseqid sseqid slen length evalue bitscore pident" \
 	    -query backward_search.$ENTRY.fasta -out backward_search.$ENTRY.report \
-	    -db input_as_db -evalue $EVALUE -num_threads $NUM_THREDS
+	    -db input_as_db -evalue $EVALUE -num_threads $NUM_THREDS -lcase_masking
 
 	echo "  Backward Search hits:" >> $OUTPUTREPORT
 	#grep "ref|\|gi|" backward_search.$ENTRY.report | head -n1 | awk 'BEGIN { FS="|" } { print $2 }' >> $OUTPUTREPORT
