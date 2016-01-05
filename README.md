@@ -10,8 +10,5 @@ Use the perl scripts provided by NCBI.
 * Download database:
 `./update_blastdb.pl nr pdbaa --decompress`
 * Build taxonomy ID:
-```
-./update_blastdb.pl taxdb
-tar -xzf taxdb.tar.gz
-```
+`./update_blastdb.pl taxdb; tar -xzf taxdb.tar.gz`
 
