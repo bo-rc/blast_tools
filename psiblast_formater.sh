@@ -82,6 +82,16 @@ do
 done
 
 # processing input arguments 
+NUM_PDB=0
+if [[ $P_PSI_BLAST_DB_1 != "" ]]
+then
+    NUM_PDB=1
+    if [[ $P_PSI_BLAST_DB_2 != "" ]]
+    then
+	NUM_PDB=2
+    fi
+fi
+
 PSI_BLAST_DB_NAME=${PSI_BLAST_DB%.*}
 P_PSI_BLAST_DB_1_NAME=${P_PSI_BLAST_DB_1%.*}
 P_PSI_BLAST_DB_2_NAME=${P_PSI_BLAST_DB_2%.*}
@@ -91,7 +101,15 @@ NUM_THREDS=${NUM_THREDS_SET:-4}
 NUM_REPORT_HITS=${NUM_REPORT_HITS_SET:-2}
 NUM_DESCRIPTIONS=${NUM_DESCRIPTIONS_SET:-9}
 NUM_ALIGNMENTS=${NUM_ALIGNMENTS_SET:-9}
-OUTPUTREPORT="${OUTPUTREPORT%.*:-"report"}-MaxHits_$NUM_REPORT_HITS-input_${INPUT_FASTA%.*}-db_$PSI_BLAST_DB_NAME-evalue_$EVALUE.txt"
+if [[ NUM_PDB == 1 ]]
+then
+    OUTPUTREPORT="${OUTPUTREPORT%.*:-"psiblast"}-Top_$NUM_REPORT_HITS-in_${INPUT_FASTA%.*}-db_$PSI_BLAST_DB_NAME-p_db_$P_PSI_BLAST_DB_1_NAME-e_$EVALUE-it_$MAX_PSI_ITER.report"
+elif [[ NUM_PDB == 2 ]]
+then
+    OUTPUTREPORT="${OUTPUTREPORT%.*:-"psiblast"}-Top_$NUM_REPORT_HITS-in_${INPUT_FASTA%.*}-db_$PSI_BLAST_DB_NAME-p_db_1_$P_PSI_BLAST_DB_1_NAME-p_db_2_$P_PSI_BLAST_DB_2_NAME-e_$EVALUE-it_$MAX_PSI_ITER.report"
+else
+    OUTPUTREPORT="${OUTPUTREPORT%.*:-"psiblast"}-Top_$NUM_REPORT_HITS-in_${INPUT_FASTA%.*}-db_$PSI_BLAST_DB_NAME-e_$EVALUE-it_$MAX_PSI_ITER.report"
+fi
 
 ############################################
 # if database is a fasta file, build a local database
@@ -189,6 +207,10 @@ do
     fi
     ## extract one fasta query from input file 
 
+    printf "\n\n\n"
+    echo "*********** processing entry $ENTRY: ***********"
+    printf "\n\n\n"
+
     #
     ## Constructing initial profile
     #
@@ -255,13 +277,16 @@ do
 	    grep "Iteration: $NUM_ITER" -A100 psiblast.$ENTRY.report > psiblast.last_iter.$ENTRY.report
 
 	    grep "ref|\|gi|" psiblast.last_iter.$ENTRY.report | awk 'BEGIN { FS="|" } { print $2 }' | uniq > tmp.REF.$ENTRY.id
-	    blastdbcmd -db $PSI_BLAST_DB_NAME -entry_batch tmp.REF.$ENTRY.id -out psiblast.last_iter.$ENTRY.fasta
+	    if [[ -s tmp.REF.$ENTRY.id ]]
+	    then
+	        blastdbcmd -db $PSI_BLAST_DB_NAME -entry_batch tmp.REF.$ENTRY.id -out psiblast.last_iter.$ENTRY.fasta
 
-	    # calculate PID
-	    echo "@@@ calculating PID"
-	    cat tmp.query.$ENTRY.fasta psiblast.last_iter.$ENTRY.fasta > tmp.Match.$ENTRY.fasta
-	    mafft tmp.Match.$ENTRY.fasta > tmp.Match.$ENTRY.fasta.aligned
-	    percid tmp.Match.$ENTRY.fasta.aligned percid.$ENTRY.percid_matrix
+	        # calculate PID
+	        echo "@@@ calculating PID"
+	        cat tmp.query.$ENTRY.fasta psiblast.last_iter.$ENTRY.fasta > tmp.Match.$ENTRY.fasta
+	        mafft tmp.Match.$ENTRY.fasta > tmp.Match.$ENTRY.fasta.aligned
+	        percid tmp.Match.$ENTRY.fasta.aligned percid.$ENTRY.percid_matrix
+	    fi
 	else
 	    echo "EMPTY: less than two hits in initial profile construction, skipping psiblast." > psiblast.$ENTRY.report
 	    echo "EMPTY: less than two hits in initial profile construction, skipping psiblast." > psiblast.last_iter.$ENTRY.report
@@ -280,17 +305,8 @@ do
     LINE_NUM=2
     while read line
     do
-	if [[ $line == "EMPTY"* ]] # 0 hits
+	if [[ $line == *"gi"* ]] || [[ $line == *"ref"* ]] || [[ $line == *"lcl"* ]]
 	then
-	    echo "less than two hits in initial profile construction, skipping psiblast." >> $OUTPUTREPORT
-
-	elif [[ $line == \#* ]] # other comment line
-	then
-
-	    # not include comments
-	    echo 
-
-	else # entries that need to be processed
 	    PERCENT=$(cat percid.$ENTRY.percid_matrix | head -n$LINE_NUM | tail -n1 | awk '{print $1}')
 	    PERCENT=$(echo "scale=2; $PERCENT*100" | bc)
 	    PERCENT=$(printf '%*.*f' 0 2 "$PERCENT")
@@ -316,6 +332,17 @@ do
 
 	    LINE_NUM=$((LINE_NUM+1))
 
+	elif [[ $line == "EMPTY"* ]] # initial PSSM failed
+	then
+	    echo "less than two hits in initial profile construction, skipping psiblast." >> $OUTPUTREPORT
+	elif [[ $line == *"# 0 hits"* ]]
+	then
+	    echo "0 hits" >> $OUTPUTREPORT
+	elif [[ $line == "" ]] # empty line
+	then
+	    echo ""
+	else # not include comments
+	    echo 
 	fi
     done <psiblast.last_iter.$ENTRY.report
 
@@ -340,6 +367,7 @@ do
 	echo "  Backward Search hits:" >> $OUTPUTREPORT
 	#grep "ref|\|gi|" backward_search.$ENTRY.report | head -n1 | awk 'BEGIN { FS="|" } { print $2 }' >> $OUTPUTREPORT
 	REPORT_STRING=$(grep "^gi|" backward_search.$ENTRY.report | head -n1)
+	echo "backward: $REPORT_STRING"
 
         # align query sequence with all hits
         cat backward_search.$ENTRY.fasta tmp.query.$ENTRY.fasta > tmp.backward_search.Match.$ENTRY.fasta
@@ -354,9 +382,7 @@ do
 	if [[ $REPORT_STRING != "" ]]
 	then
 	    arr=($REPORT_STRING)
-	    printf "%30s %10s %10s %10s %8s %10s %10s\n" ${arr[1]} \
-	    ${arr[2]} ${arr[3]} ${arr[4]} \
-	    ${arr[5]} ${arr[6]} $PERCENT >> $OUTPUTREPORT
+	    printf "%30s %10s %10s %10s %8s %10s %10s\n" ${arr[1]} ${arr[2]} ${arr[3]} ${arr[4]} ${arr[5]} ${arr[6]} $PERCENT >> $OUTPUTREPORT
 	fi
 
 	echo  >> $OUTPUTREPORT

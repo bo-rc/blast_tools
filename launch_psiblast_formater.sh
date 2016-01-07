@@ -23,10 +23,10 @@ do
     for e in 0.01
     do
         ~/Projects/blast/blast_tools/psiblast_formater.sh \
-        --input-fasta two.fasta \
+        --input-fasta unknownThree.fasta \
         --output-filename psiblast-report \
         --database $db \
-        --clean 0 \
+        --clean 2 \
         --evalue $e \
         --num-report-hits 3 \
         --backward-search 0 \
