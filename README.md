@@ -9,9 +9,9 @@ Use the `update_blastdb.pl` perl scripts provided by NCBI:
 * Build taxonomy ID:
 `./update_blastdb.pl taxdb; tar -xzf taxdb.tar.gz`
 
-# BLAST search for proteins: `blastp_formater.sh`
+# BLAST for proteins: `blastp_formater.sh`
 
-# PSIBLAST search for proteins: `psiblast_formater.sh`
+# PSIBLAST for proteins: `psiblast_formater.sh`
 
 ## Flow Chart
 
