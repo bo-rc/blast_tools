@@ -12,3 +12,9 @@ Use the perl scripts provided by NCBI.
 * Build taxonomy ID:
 `./update_blastdb.pl taxdb; tar -xzf taxdb.tar.gz`
 
+**Clean Level**:
+* `0`: temporary files are kept.
+* `1`: temporary files and backwar-search files are deleted.
+* `2`: profile database files are deleted + the effect of `1`
+* `3`: psiblast last iteration report is deleted + the effect of `2`
+
