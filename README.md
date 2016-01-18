@@ -15,7 +15,7 @@ Use the `update_blastdb.pl` perl scripts provided by NCBI:
 
 ## Flow Chart
 
-![blast-protocol](https://cloud.githubusercontent.com/assets/14265605/12404273/aa8223b0-bdff-11e5-9173-679cabd8997c.png)
+![blast-protocol](https://cloud.githubusercontent.com/assets/14265605/12404303/eda162c8-bdff-11e5-8f0d-0ea51570adfe.png)
 
 ## Arguments
 **Clean Level** (`--clean`):
