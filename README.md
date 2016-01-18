@@ -15,6 +15,8 @@ Use the `update_blastdb.pl` perl scripts provided by NCBI:
 
 ## Flow Chart
 
+![blast-protocol](https://cloud.githubusercontent.com/assets/14265605/12404273/aa8223b0-bdff-11e5-9173-679cabd8997c.png)
+
 ## Arguments
 **Clean Level** (`--clean`):
 * `0`: temporary files are kept.
