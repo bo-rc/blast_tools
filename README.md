@@ -32,11 +32,11 @@ Use the `update_blastdb.pl` perl scripts provided by NCBI:
 4. Use the list of GIs from the previous step with the `blastdb_aliastool` to build an aliased blastdb of just gram-positive bacteria (takes several seconds): `blastdb_aliastool -gilist gram-positive-bacteria.gi_list.txt -db nr -out nr_gpb -title nr_gpb`
 
 ## How many sequences in sub-databases?
-**Ecoli DB**: 149236
-**Mycoplasma**: 230866
-**Firmicutes** (gram-positive bacteria): 49749635
-**prokaryotes**: 204031745
-**bacteria**: 200863227
+* **Ecoli DB**: 149236
+* **Mycoplasma**: 230866
+* **Firmicutes** (gram-positive bacteria): 49749635
+* **prokaryotes**: 204031745
+* **bacteria**: 200863227
 
 
 
