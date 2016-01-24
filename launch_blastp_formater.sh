@@ -3,11 +3,13 @@
 # try all the evalues in the following list
 for e in 0.01
 do
-./blastp_formater.sh \
-    --input-fasta M_myc_aaRS.txt \
-    --output-filename report \
+~/Projects/blast/blast_tools/blastp_formater.sh \
+    --input-fasta M_myc_aaRS.fasta \
+    --output-filename report-back-full \
     --database Ecoli.fasta \
-    --clean \
+    --clean 1 \
+    --evalue $e \
     --num-report-hits 1 \
-    --evalue $e
+    --backward-search 1 \
+    --num-threads 6 
 done
