@@ -54,11 +54,14 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 
 **BLASTP**: the algorithm described in [BLAST+ Paper](https://www.ncbi.nlm.nih.gov/pubmed/20003500?dopt=Citation).
 
-**PSIBLAST**:
+**The PSIBLAST protocol of our choice**:
 
-<img src="https://cloud.githubusercontent.com/assets/14265605/12404303/eda162c8-bdff-11e5-8f0d-0ea51570adfe.png" width="640">
+<img src="https://cloud.githubusercontent.com/assets/14265605/12552375/1631c278-c337-11e5-9bba-d6fbe745fb29.png" width="640">
 
-**The protocol of our choice**:
+**Structural Alignments and Protein Evolutionary Profile**:
+1. perform BLASTP using `pdbaa` to find hits in the PDB database.
+2. perform BLASTP or PSIBLAST using a larger database to get better sequence hits.
+3. perform MultiSeq structural alignment and profile profile building.
 
 # Build a local database
 Use the `update_blastdb.pl` perl scripts (provided by NCBI):
