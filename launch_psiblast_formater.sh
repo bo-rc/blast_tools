@@ -11,25 +11,26 @@ export BLASTDB="$HOME/blast/db"
 #     2. The first iteration of psiblast uses standard scoring matrix,
 #        effectively a blastp search using the target database.
 export P_PSI_BLAST_DB_1="Ecoli"
-export NUM_DESCRIPTIONS_P_PSI_BLAST_DB_1=1
+# export NUM_DESCRIPTIONS_P_PSI_BLAST_DB_1=9 # not used
 
-export P_PSI_BLAST_DB_2="Bsubtilis168"
-export NUM_DESCRIPTIONS_P_PSI_BLAST_DB_2=1
+#export P_PSI_BLAST_DB_2="Bsubtilis168"
+# export NUM_DESCRIPTIONS_P_PSI_BLAST_DB_2=9 # not used
 
 # Launch psiblast
 # searches performed for all e-values in the following list
-for db in "pdbaa"
+for db in pdbaa
 do
-    for e in 0.01
+    for e in 0.0001
     do
         ~/Projects/blast/blast_tools/psiblast_formater.sh \
-        --input-fasta unknownThree.fasta \
-        --output-filename psiblast-report \
+        --input-fasta unknown8.fasta \
+        --output-filename psiblast \
         --database $db \
-        --clean 2 \
+        --clean 3 \
+        --initial-evalue 0.1 \
         --evalue $e \
         --num-report-hits 3 \
-        --backward-search 0 \
+	--backward-search 1 \
         --num-threads 6 \
         --max-num-psi-iteration 5
     done

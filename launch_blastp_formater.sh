@@ -1,15 +1,18 @@
 #!/bin/bash
 
 # try all the evalues in the following list
-for e in 0.01
+for db in "nr_prokaryotes"
 do
-~/Projects/blast/blast_tools/blastp_formater.sh \
-    --input-fasta M_myc_aaRS.fasta \
-    --output-filename report-back-full \
-    --database Ecoli.fasta \
+  for e in 0.0001
+  do
+    ~/Projects/blast/blast_tools/blastp_formater.sh \
+    --input-fasta unknown8.fasta \
+    --output-filename blastp \
+    --database $db \
     --clean 1 \
     --evalue $e \
-    --num-report-hits 1 \
+    --num-report-hits 3 \
     --backward-search 1 \
     --num-threads 6 
+  done
 done
