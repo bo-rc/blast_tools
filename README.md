@@ -84,6 +84,8 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 
 **BLASTP**: the algorithm described in [BLAST+ Paper](https://www.ncbi.nlm.nih.gov/pubmed/20003500?dopt=Citation).
 
+<img src="https://cloud.githubusercontent.com/assets/14265605/12565871/4b8bc672-c37c-11e5-9727-47a633e06a90.png" width="640">
+
 **The PSIBLAST protocol of our choice**:
 
 <img src="https://cloud.githubusercontent.com/assets/14265605/12562867/01141e46-c36d-11e5-943b-158aff59caf1.png" width="640">
