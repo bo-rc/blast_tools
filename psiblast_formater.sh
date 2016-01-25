@@ -276,6 +276,12 @@ do
       mafft p_db.$ENTRY.fasta > p_db.$ENTRY.fasta.aligned
 
       #
+      ## QR-reduction disabled just for now: initial hits are few, no benefits to do QR-reduction
+      # comments: ALSO: the QR source code does not store fasta headers, which are needed for this protocol
+      #   Bo Liu: disable seqqr here for the reason in comments 
+      # seqqr p_db.$ENTRY.fasta.aligned p_db.$ENTRY.fasta.aligned.qr
+
+      #
       ## PSIBLAST loops
       #
       echo "@@@ PSIBLAST loops"
