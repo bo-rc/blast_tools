@@ -73,7 +73,7 @@ Use the `update_blastdb.pl` perl scripts (provided by NCBI):
 1. Download the prebuilt nr database (ncbi).
 2. Search the [Protein database](http://www.ncbi.nlm.nih.gov/protein) with query: "gram-positive bacteria"
 3. Select "Send to File" and choose format "GI list"
-4. Use the list of GIs from the previous step with the `blastdb_aliastool` to build an aliased blastdb of just gram-positive bacteria (takes several seconds): `blastdb_aliastool -gilist gram-positive-bacteria.gi_list.txt -db nr -out nr_gpb -title nr_gpb`
+4. Use the list of GIs from the previous step with the `blastdb_aliastool` to build an aliased blastdb of just gram-positive bacteria (takes several seconds): `blastdb_aliastool -gilist [*GI list filename*] -db nr -out [*sub-database name*] -title [*sub-database title*]`
 
 ### How many sequences in sub-databases?
 * **Ecoli DB**: 149236
