@@ -78,7 +78,7 @@ Use the `update_blastdb.pl` perl scripts (provided by NCBI):
 ### How many sequences in sub-databases?
 * **Ecoli DB**: 149236
 * **Mycoplasma**: 230866
-* **Firmicutes** (gram-positive bacteria): 49749635
+* **Gram-positive bacteria**: 49749635
 * **prokaryotes**: 204031745
 * **bacteria**: 200863227
 
