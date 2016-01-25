@@ -56,7 +56,7 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 
 **The PSIBLAST protocol of our choice**:
 
-<img src="https://cloud.githubusercontent.com/assets/14265605/12552375/1631c278-c337-11e5-9bba-d6fbe745fb29.png" width="640">
+<img src="https://cloud.githubusercontent.com/assets/14265605/12562867/01141e46-c36d-11e5-943b-158aff59caf1.png" width="640">
 
 **Structural Alignments and Protein Evolutionary Profile**:
 
