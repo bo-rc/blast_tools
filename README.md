@@ -1,5 +1,5 @@
 # blast_tools
-This repository hosts a set of *bash* scripts which would automate the command line programs of BLAST+ tools.
+This repository hosts a set of *bash* scripts which aim to automate searching of biological sequence databases via the command line programs of BLAST+ tools.
 
 ## What is BLAST?
 **BLAST** stands for **B**asic **L**ocal **A**lignment **S**earch **T**ool. It is a sequence comparison algorithm optimized for speed used to search sequence databases for optimal local alignments to a query. The initial search isolates a window of width `w`, which contains `w` letters, of both query and target sequences to calculate a similarity score. If this score is above a *threshold*, the comparisons are then extended in either direction to maximize the alignment of an increasing segment of the two sequences. The extent of the extension contributes to the *bit score* of the alignment: the higher the *bit score*, the better the alignment which indicates the similarity of the two sequences.
