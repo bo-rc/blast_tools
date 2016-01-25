@@ -50,6 +50,33 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 * `2`: profile database files are deleted + the effect of `1`
 * `3`: psiblast last iteration report is deleted + the effect of `2`
 
+**Input** (`--input-fasta`)
+
+**Output** (`--output-filename`): assigns the prefix for the output `.report` text file, whose filename also includes critical parameters used in the search.
+
+**Database** (`--database`): search will be performed in this database.
+* can be NCBI binary format
+* can be a plain `.fasta` file: `blastdbcmd` will be called to generate database files with this `.fasta` file
+
+**Initial Evalue** (`--initial-evalue`): the evalue for the BLAST search to build an inital PSSM for the PSIBLAST search.
+* default is 0.001
+
+**Evalue** (`--evalue`): the evalue for BLAST search or PSIBLAST search after the initial PSSM is determined.
+* default is 0.001
+
+**Number of Hits in Report** (`--num-report-hits`): in case the search gives multiple hits, this option chooses the top `N` hits to be in the final report.
+* defualt is 1
+
+**Backward Search** (`--backward-search`): this option enables the search using the hit as a query sequence and the input fasta file as a database. The backward search is supposed to hit the original query sequence.
+
+**Number of Threads** (`--num-threads`): use multiple threads for the search.
+* default is 4
+
+**Number of PSIBLAST iteration** (`--max-num-psi-iteration`)
+* `0` means perform PSIBLAST untill the search is converged.
+* a non-`0` N means perfom N iterations of PSIBLAST searches.
+ * typically the search will converge within 5 iterations.
+
 ## Flow Charts
 
 **BLASTP**: the algorithm described in [BLAST+ Paper](https://www.ncbi.nlm.nih.gov/pubmed/20003500?dopt=Citation).
