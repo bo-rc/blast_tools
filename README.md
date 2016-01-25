@@ -60,10 +60,8 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 
 **The protocol of our choice**:
 
-
-
 # Build a local database
-Use the `update_blastdb.pl` perl scripts provided by NCBI:
+Use the `update_blastdb.pl` perl scripts (provided by NCBI):
 * Go to the path of your local database directory
 * Download database:
 `./update_blastdb.pl nr pdbaa --decompress`
@@ -73,7 +71,7 @@ Use the `update_blastdb.pl` perl scripts provided by NCBI:
 ## Build a sub-database
 
 1. Download the prebuilt nr database (ncbi).
-2. Search the [Entrez Protein database](http://www.ncbi.nlm.nih.gov/protein) with query: "gram-positive bacteria"
+2. Search the [Protein database](http://www.ncbi.nlm.nih.gov/protein) with query: "gram-positive bacteria"
 3. Select "Send to File" and choose format "GI list"
 4. Use the list of GIs from the previous step with the `blastdb_aliastool` to build an aliased blastdb of just gram-positive bacteria (takes several seconds): `blastdb_aliastool -gilist gram-positive-bacteria.gi_list.txt -db nr -out nr_gpb -title nr_gpb`
 
