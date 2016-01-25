@@ -17,7 +17,7 @@ The purpose of this set of scripts is to automate BLAST search tasks for multipl
  * *Backward Search* can be turned on and off using the *launch* scripts.
 * `percid` program in [MultiSeq](http://www.scs.illinois.edu/schulten/multiseq/) is used to calculate the percentage of similarity between query and target sequences.
 * The initial searching database and the PSIBLAST taget database can be different and use different *e-values*.
-* QR-reduction is used to process the generated sequence profiles of PSIBLAST.
+* [QR-reduction](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-7-382) is used to process the generated sequence profiles of PSIBLAST.
 
 The scripts are exclusively written in *bash* to meet the requirements of the university groups using the tools. 
 
