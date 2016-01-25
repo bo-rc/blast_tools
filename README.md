@@ -59,6 +59,7 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 <img src="https://cloud.githubusercontent.com/assets/14265605/12552375/1631c278-c337-11e5-9bba-d6fbe745fb29.png" width="640">
 
 **Structural Alignments and Protein Evolutionary Profile**:
+
 1. perform BLASTP using `pdbaa` to find hits in the PDB database.
 2. perform BLASTP or PSIBLAST using a larger database to get better sequence hits.
 3. perform MultiSeq structural alignment and profile profile building.
