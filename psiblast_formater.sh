@@ -229,7 +229,7 @@ do
     echo "@@@     processing profile database 1"
     blastp -outfmt "7 sseqid slen length evalue bitscore pident stitle" \
     -query tmp.query.$ENTRY.fasta -out p_db_1.$ENTRY.report -db $P_PSI_BLAST_DB_1_NAME \
-    -evalue $INIT_EVALUE -num_threads $NUM_THREDS -lcase_masking  -max_target_seqs $NUM_DESCRIPTIONS_P_PSI_BLAST_DB_1
+    -evalue $INIT_EVALUE -num_threads $NUM_THREDS -lcase_masking  #-max_target_seqs $NUM_DESCRIPTIONS_P_PSI_BLAST_DB_1
 
     grep "ref|\|gi|" p_db_1.$ENTRY.report | awk 'BEGIN { FS="|" } { print $2 }' | uniq > tmp.P_REF_1.$ENTRY.id
     echo "@@@    profile 1 contains sequences:"
@@ -245,7 +245,7 @@ do
     echo "@@@     processing profile database 2"
     blastp -outfmt "7 sseqid slen length evalue bitscore pident stitle" -query tmp.query.$ENTRY.fasta \
     -out p_db_2.$ENTRY.report -db $P_PSI_BLAST_DB_2_NAME -evalue $INIT_EVALUE -num_threads $NUM_THREDS \
-    -lcase_masking -max_target_seqs $NUM_DESCRIPTIONS_P_PSI_BLAST_DB_2
+    -lcase_masking #-max_target_seqs $NUM_DESCRIPTIONS_P_PSI_BLAST_DB_2
 
     grep "ref|\|gi|" p_db_2.$ENTRY.report | awk 'BEGIN { FS="|" } { print $2 }' | uniq > tmp.P_REF_2.$ENTRY.id
     echo "@@@    profile 2 contains sequences:"
