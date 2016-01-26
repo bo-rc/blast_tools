@@ -5,7 +5,7 @@ for db in "nr_prokaryotes"
 do
   for e in 0.0001
   do
-    ~/Projects/blast/blast_tools/blastp_formater.sh \
+    ~/Projects/blast/blast_tools/blastp_formatter.sh \
     --input-fasta unknown8.fasta \
     --output-filename blastp \
     --database $db \

@@ -22,7 +22,7 @@ for db in pdbaa
 do
     for e in 0.0001
     do
-        ~/Projects/blast/blast_tools/psiblast_formater.sh \
+        ~/Projects/blast/blast_tools/psiblast_formatter.sh \
         --input-fasta unknown8.fasta \
         --output-filename psiblast \
         --database $db \
