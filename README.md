@@ -92,7 +92,7 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 
 **Important Notes**:
 * remember to run a sanity search with a much larger `e-value` to check whether qualified hits are missed by the BLAST+ algorithms.
- * We found that with the BLAST search results depend on input `e-value`s: if the input `e-value` is very small, some important hits which are rare but qualified in terms of the input `e-value` can be missed in the final report.
+ * We found that BLAST search results may depend on input `e-value`s: if the input `e-value` is very small, some rare but qualified hits in terms of the input `e-value` can be missed in the final report.
 
 **Structural Alignments and Protein Evolutionary Profile**:
 
