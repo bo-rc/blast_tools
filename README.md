@@ -90,15 +90,15 @@ This script first performs a `blastp` search to determine initial hits for `seqq
 
 <img src="https://cloud.githubusercontent.com/assets/14265605/12654155/60b6964c-c5b8-11e5-84d6-69a9fdf4ffa2.png" width="640">
 
+**Important Notes**:
+* remember to run a sanity search with a much larger `e-value` to check whether qualified hits are missed by the BLAST+ algorithms.
+ * We found that with the BLAST search results depend on input `e-value`s: if the input `e-value` is very small, some important hits which are rare but qualified in terms of the input `e-value` can be missed in the final report.
+
 **Structural Alignments and Protein Evolutionary Profile**:
 
 1. perform BLASTP using `pdbaa` to find hits in the PDB database.
 2. perform BLASTP or PSIBLAST using a larger database to get better sequence hits.
 3. perform MultiSeq structural alignment and profile profile building.
-
-**Important Notes**:
-* remember to run a sanity search with a much larger `e-value` to check whether qualified hits are missed by the BLAST+ algorithms.
- * We found that with the BLAST search results depend on input `e-value`s: if the input `e-value` is very small, some important hits which are rare but qualified in terms of the input `e-value` can be missed in the final report.
 
 # Build a local database
 Use the `update_blastdb.pl` perl scripts (provided by NCBI):
